@@ -50,6 +50,9 @@ def do_train(
     meters = MetricLogger(delimiter="  ")
     max_iter = len(data_loader)
     start_iter = arguments["iteration"]
+
+    task_name = arguments["task_name"]
+
     model.train()
     start_training_time = time.time()
     end = time.time()
@@ -101,9 +104,9 @@ def do_train(
                 )
             )
         if iteration % checkpoint_period == 0 and iteration > 0:
-            checkpointer.save("model_{:07d}".format(iteration), **arguments)
+            checkpointer.save("model_{}_{:07d}".format(task_name, iteration), **arguments)
 
-    checkpointer.save("model_{:07d}".format(iteration), **arguments)
+    checkpointer.save("model_{}_{:07d}".format(task_name, iteration), **arguments)
     total_training_time = time.time() - start_training_time
     total_time_str = str(datetime.timedelta(seconds=total_training_time))
     logger.info(

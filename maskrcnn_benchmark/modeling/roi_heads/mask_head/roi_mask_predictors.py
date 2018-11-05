@@ -12,6 +12,8 @@ class MaskRCNNC4Predictor(nn.Module):
         num_classes = cfg.MODEL.ROI_BOX_HEAD.NUM_CLASSES
         dim_reduced = cfg.MODEL.ROI_MASK_HEAD.CONV_LAYERS[-1]
 
+        self.large_loss_flag = cfg.MODEL.ROI_MASK_HEAD.LARGE_LOSS
+
         if cfg.MODEL.ROI_HEADS.USE_FPN:
             num_inputs = dim_reduced
         else:
@@ -23,6 +25,11 @@ class MaskRCNNC4Predictor(nn.Module):
         self.conv5_mask = ConvTranspose2d(num_inputs, dim_reduced, 2, 2, 0)
         self.mask_fcn_logits = Conv2d(dim_reduced, num_classes, 1, 1, 0)
 
+        if self.large_loss_flag:
+            assert cfg.MODEL.ROI_MASK_HEAD.RESOLUTION % cfg.MODEL.ROI_MASK_HEAD.POOLER_RESOLUTION == 0 , "large_loss_scale must be an int"
+            large_loss_scale = cfg.MODEL.ROI_MASK_HEAD.RESOLUTION / cfg.MODEL.ROI_MASK_HEAD.POOLER_RESOLUTION / 2
+            self.mask_fcn_logits_scale = nn.UpsamplingBilinear2d(scale_factor=large_loss_scale)
+
         for name, param in self.named_parameters():
             if "bias" in name:
                 nn.init.constant_(param, 0)
@@ -33,7 +40,11 @@ class MaskRCNNC4Predictor(nn.Module):
 
     def forward(self, x):
         x = F.relu(self.conv5_mask(x))
-        return self.mask_fcn_logits(x)
+        if self.large_loss_flag:
+            # print("################## USING LARGE LOSS #########################")
+            return self.mask_fcn_logits_scale(self.mask_fcn_logits(x))
+        else:
+            return self.mask_fcn_logits(x)
 
 
 _ROI_MASK_PREDICTOR = {"MaskRCNNC4Predictor": MaskRCNNC4Predictor}

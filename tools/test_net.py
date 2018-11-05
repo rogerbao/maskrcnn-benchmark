@@ -44,12 +44,15 @@ def main():
         torch.distributed.deprecated.init_process_group(
             backend="nccl", init_method="env://"
         )
+    else:
+        torch.cuda.set_device(args.local_rank)
 
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
 
-    save_dir = ""
+    save_dir = os.path.join(cfg.OUTPUT_DIR, cfg.TASKINFO.TASKNAME, "inference")
+    mkdir(save_dir)
     logger = setup_logger("maskrcnn_benchmark", save_dir, get_rank())
     logger.info("Using {} GPUs".format(num_gpus))
     logger.info(cfg)
@@ -67,10 +70,10 @@ def main():
     if cfg.MODEL.MASK_ON:
         iou_types = iou_types + ("segm",)
     output_folders = [None] * len(cfg.DATASETS.TEST)
-    if cfg.OUTPUT_DIR:
+    if os.path.join(cfg.OUTPUT_DIR, cfg.TASKINFO.TASKNAME):
         dataset_names = cfg.DATASETS.TEST
         for idx, dataset_name in enumerate(dataset_names):
-            output_folder = os.path.join(cfg.OUTPUT_DIR, "inference", dataset_name)
+            output_folder = os.path.join(cfg.OUTPUT_DIR, cfg.TASKINFO.TASKNAME, "inference", dataset_name)
             mkdir(output_folder)
             output_folders[idx] = output_folder
     data_loaders_val = make_data_loader(cfg, is_train=False, is_distributed=distributed)

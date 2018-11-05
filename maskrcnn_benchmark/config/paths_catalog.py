@@ -21,6 +21,26 @@ class DatasetCatalog(object):
             "coco/val2014",
             "coco/annotations/instances_valminusminival2014.json",
         ),
+        "coco_HumanCollection_train": (
+            "coco/HC_train",
+            "coco/annotations/instances_HC_train.json",
+        ),
+        "coco_HumanCollection_val": (
+            "coco/HC_val",
+            "coco/annotations/instances_HC_val.json",
+        ),
+        "coco_HC_mini_trainval": (
+            "coco_HC_mini/HC_mini_trainval",
+            "coco_HC_mini/annotations/instances_HC_mini_trainval.json",
+        ),
+        "coco_HC_mini_test": (
+            "coco_HC_mini/HC_mini_test",
+            "coco_HC_mini/annotations/instances_HC_mini_test.json",
+        ),
+        "coco_HW_test_set": (
+            "coco_HW_test_set/HW_test_set",
+            "coco_HW_test_set/annotations/instances_HW_test_set_test.json",
+        ),
     }
 
     @staticmethod

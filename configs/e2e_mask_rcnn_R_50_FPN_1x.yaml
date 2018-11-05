@@ -1,6 +1,8 @@
 MODEL:
   META_ARCHITECTURE: "GeneralizedRCNN"
-  WEIGHT: "catalog://ImageNetPretrained/MSRA/R-50"
+#  WEIGHT: "catalog://ImageNetPretrained/MSRA/R-50"
+  WEIGHT: "pretrain_model/R-50.pkl"
+#  WEIGHT: "snapshot/R50_FPN-large_loss/model_0165000.pth"
   BACKBONE:
     CONV_BODY: "R-50-FPN"
     OUT_CHANNELS: 256
@@ -26,11 +28,15 @@ MODEL:
     POOLER_RESOLUTION: 14
     POOLER_SAMPLING_RATIO: 2
     RESOLUTION: 28
+#    RESOLUTION: 224
     SHARE_BOX_FEATURE_EXTRACTOR: False
   MASK_ON: True
 DATASETS:
-  TRAIN: ("coco_2014_train", "coco_2014_valminusminival")
-  TEST: ("coco_2014_minival",)
+#  TRAIN: ("coco_2014_train", "coco_2014_valminusminival")
+#  TEST: ("coco_2014_minival",)
+  TRAIN: ("coco_HC_mini_trainval",)
+  TEST: ("coco_HC_mini_test",)
+#  TEST: ("coco_HW_test_set",)
 DATALOADER:
   SIZE_DIVISIBILITY: 32
 SOLVER:
@@ -38,3 +44,5 @@ SOLVER:
   WEIGHT_DECAY: 0.0001
   STEPS: (60000, 80000)
   MAX_ITER: 90000
+TASKINFO:
+  TASKNAME: "R50_FPN-large_loss"

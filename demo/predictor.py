@@ -179,6 +179,23 @@ class COCODemo(object):
 
         return result
 
+    def brd_run_on_opencv_image(self, image):
+        """
+        Arguments:
+            image (np.ndarray): an image as returned by OpenCV
+
+        Returns:
+            prediction (BoxList): the detected objects. Additional information
+                of the detection properties can be found in the fields of
+                the BoxList via `prediction.fields()`
+        """
+        predictions = self.compute_prediction(image)
+        top_predictions = self.select_top_predictions(predictions)
+        masks = top_predictions.get_field("mask").numpy()
+        mask = masks[0, 0, :, :]
+        mask[mask!=0] =255
+        return mask
+
     def compute_prediction(self, original_image):
         """
         Arguments:

@@ -43,8 +43,10 @@ def train(cfg, local_rank, distributed):
 
     arguments = {}
     arguments["iteration"] = 0
+    arguments["task_name"] = cfg.TASKINFO.TASKNAME
 
-    output_dir = cfg.OUTPUT_DIR
+    # output_dir = cfg.OUTPUT_DIR
+    output_dir = os.path.join(cfg.OUTPUT_DIR, cfg.TASKINFO.TASKNAME)
 
     save_to_disk = get_rank() == 0
     checkpointer = DetectronCheckpointer(
@@ -114,7 +116,7 @@ def main():
         help="path to config file",
         type=str,
     )
-    parser.add_argument("--local_rank", type=int, default=0)
+    parser.add_argument("--local_rank", type=int, default=3)
     parser.add_argument(
         "--skip-test",
         dest="skip_test",
@@ -138,12 +140,15 @@ def main():
         torch.distributed.deprecated.init_process_group(
             backend="nccl", init_method="env://"
         )
+    else:
+        torch.cuda.set_device(args.local_rank)
 
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
 
-    output_dir = cfg.OUTPUT_DIR
+    # output_dir = cfg.OUTPUT_DIR
+    output_dir = os.path.join(cfg.OUTPUT_DIR, cfg.TASKINFO.TASKNAME)
     if output_dir:
         mkdir(output_dir)
 

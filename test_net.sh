@@ -1,0 +1,11 @@
+#!/bin/bash
+ITER_LIST=('160000' '170000' '180000' '190000' '200000' '210000' '220000' '230000' '240000' '250000')
+TASK_NAME='R50_FPN'
+GPU_INDEX=0
+
+for ITER_NUM in ${ITER_LIST[@]}
+do
+python tools/test_net.py --config-file "configs/e2e_mask_rcnn_R_50_FPN_1x.yaml" --local_rank ${GPU_INDEX} MODEL.WEIGHT "snapshot/${TASK_NAME}/model_0"${ITER_NUM}".pth"\
+ TASKINFO.TASKNAME ${TASK_NAME}\
+ MODEL.ROI_MASK_HEAD.RESOLUTION 28 MODEL.ROI_MASK_HEAD.LARGE_LOSS False TEST.IMS_PER_BATCH 2
+done
